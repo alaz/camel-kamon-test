@@ -13,14 +13,36 @@
     <bean id="worker" class="JobHandler"/>
 
     <camelContext xmlns="http://camel.apache.org/schema/spring" id="kamon-on" streamCache="true">
-        <route id="emitter">
-            <from uri="timer:emitter?period=5"/>
-            <to uri="seda:queue"/>
+        <route id="emitter1">
+            <from uri="timer:emitter1?period=1"/>
+            <to uri="disruptor:bus?multipleConsumers=true&amp;size=16&amp;blockWhenFull=true"/>
         </route>
 
-        <route id="queue">
-            <from uri="seda:queue"/>
-            <bean ref="worker" method="handle" id="handleMessage"/>
+        <route id="emitter2">
+            <from uri="timer:emitter2?period=1"/>
+            <to uri="disruptor:bus?multipleConsumers=true&amp;size=16&amp;blockWhenFull=true"/>
+        </route>
+
+        <route id="emitter3">
+            <from uri="timer:emitter3?period=1"/>
+            <to uri="disruptor:bus?multipleConsumers=true&amp;size=16&amp;blockWhenFull=true"/>
+        </route>
+
+        <route id="worker1">
+            <from uri="disruptor:bus?multipleConsumers=true&amp;size=16&amp;blockWhenFull=true"/>
+            <bean ref="worker" method="handle" id="handleMessage1"/>
+        </route>
+
+        <route id="worker2">
+            <from uri="disruptor:bus?multipleConsumers=true&amp;size=16&amp;blockWhenFull=true"/>
+            <setProperty propertyName="CamelTimerCounter">
+                <simple resultType="Long">${exchangeProperty.CamelTimerCounter}++</simple>
+            </setProperty>
+            <bean ref="worker" method="handle" id="handleMessage2"/>
+        </route>
+
+        <route id="worker3">
+            <from uri="disruptor:bus?multipleConsumers=true&amp;size=16&amp;blockWhenFull=true"/>
             <aggregate groupExchanges="true" completionInterval="5000" parallelProcessing="true" id="groupMessages">
                 <correlationExpression>
                     <constant>true</constant>

@@ -11,6 +11,7 @@ val KamonVer = "0.5.1"
 libraryDependencies ++= Seq(
   "com.osinka.camel"          %% "camel-kamon"            % "1.0.0-SNAPSHOT",
   "org.apache.camel"          %  "camel-core"             % CamelVer,
+  "org.apache.camel"          %  "camel-disruptor"        % CamelVer,
   "org.apache.camel"          %  "camel-spring"           % CamelVer,
 //  "io.kamon"                  %% "kamon-log-reporter"     % KamonVer,
   "org.slf4j"                 %  "slf4j-simple"           % "1.7.12"
